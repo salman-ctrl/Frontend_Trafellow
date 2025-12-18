@@ -111,7 +111,7 @@ const RegionList = () => {
             <button
               key={region.region_id}
               onClick={() => handleRegionClick(region.region_id)}
-              className="group relative rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 h-64"
+              className="group relative rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 h-80"
             >
               {region.image && (
                 <img
