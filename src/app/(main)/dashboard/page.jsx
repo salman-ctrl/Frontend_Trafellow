@@ -27,8 +27,8 @@ const RegionList = () => {
     try {
       const [regionsRes, destinationsRes, eventsRes] = await Promise.all([
         api.get('/regions'),
-        api.get('/destinations?limit=3'),
-        api.get('/events?limit=3')
+        api.get('/destinations'),
+        api.get('/events')
       ]);
       
       setRegions(regionsRes.data.data);
@@ -56,17 +56,21 @@ const RegionList = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
+      <>
         <Navbar />
-        <div className="relative h-[60vh] mb-16 bg-slate-100 animate-pulse"></div>
-        <div className="max-w-7xl mx-auto px-4 space-y-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="relative h-96 mb-16 bg-gradient-to-r from-purple-500 to-blue-500 animate-pulse"></div>
+        <section className="container mx-auto px-4 mb-16">
+          <div className="text-center mb-8">
+            <div className="h-8 bg-gray-200 rounded w-64 mx-auto mb-2"></div>
+            <div className="h-4 bg-gray-200 rounded w-96 mx-auto"></div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-slate-100 rounded-2xl h-48 animate-pulse"></div>
+              <div key={i} className="bg-gray-200 rounded-xl h-48 animate-pulse"></div>
             ))}
           </div>
-        </div>
-      </div>
+        </section>
+      </>
     );
   }
 
@@ -74,66 +78,58 @@ const RegionList = () => {
     <div className="min-h-screen bg-white font-sans selection:bg-blue-100 selection:text-blue-900">
       <Navbar />
       
-      <section className="relative h-[70vh] mb-20 overflow-hidden">
+      <section className="relative h-[60vh] mb-16 overflow-hidden">
         <div className="absolute inset-0">
           <img 
             src="/background/dashboard/hero.png" 
             alt="West Sumatra" 
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover opacity-100"
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-white"></div>
-        <div className="relative z-10 flex flex-col items-center justify-center h-full text-white text-center px-4 max-w-4xl mx-auto">
-          <span className="bg-white/10 backdrop-blur-md border border-white/20 text-white px-4 py-1.5 rounded-full text-sm font-medium mb-6 uppercase tracking-wider">
-            Explore West Sumatra
-          </span>
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-            Jelajahi Keindahan <br/> Ranah Minang
-          </h1>
-          <p className="text-lg md:text-xl text-gray-100 mb-8 max-w-2xl leading-relaxed">
-            Temukan destinasi wisata menakjubkan dan bergabung dengan komunitas pecinta wisata terbesar di Sumatera Barat.
+
+        <div className="absolute inset-0 bg-black/40"></div>
+
+        <div className="relative z-10 flex flex-col items-center justify-center h-full text-white text-center px-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Jelajahi Keindahan Sumatera Barat</h1>
+          <p className="text-lg md:text-xl mb-6">
+            Temukan destinasi wisata menakjubkan dan bergabung dengan komunitas pecinta wisata
           </p>
-          <button 
-            onClick={() => document.getElementById('explore').scrollIntoView({ behavior: 'smooth' })}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-4 rounded-xl transition-all hover:-translate-y-1 shadow-lg shadow-blue-600/30 flex items-center gap-2"
-          >
-            Mulai Jelajah <ArrowRight className="w-5 h-5" />
+          <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors duration-300">
+            Mulai Jelajah
           </button>
         </div>
       </section>
 
-      <section id="explore" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-24">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Jelajahi Wilayah</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Dari pegunungan yang sejuk hingga pantai yang memukau, pilih destinasi favoritmu berdasarkan wilayah.
-          </p>
+      <section className="container mx-auto px-4 mb-24">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">Pilih Kabupaten/Kota</h2>
+          <p className="text-gray-600">Jelajahi destinasi wisata di berbagai wilayah Sumatera Barat</p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {regions.map((region) => (
             <button
               key={region.region_id}
               onClick={() => handleRegionClick(region.region_id)}
-              className="group relative h-64 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500"
+              className="group relative rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 h-48"
             >
-              {region.image ? (
+              {region.image && (
                 <img
                   src={getImageUrl(region.image)}
                   alt={region.name}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
-              ) : (
-                <div className="absolute inset-0 bg-gray-200 w-full h-full" />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80"></div>
-              <div className="absolute bottom-0 left-0 right-0 p-6 text-left">
-                <span className="inline-block px-2 py-1 bg-white/20 backdrop-blur-sm rounded text-[10px] font-bold text-white mb-2 uppercase tracking-wide border border-white/10">
-                  {region.type === 'kota' ? 'Kota' : 'Kabupaten'}
-                </span>
-                <h3 className="text-xl font-bold text-white group-hover:text-blue-200 transition-colors">
+
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+
+              <div className="relative z-10 flex flex-col items-center justify-center h-full p-4 text-white">
+                <h3 className="text-base font-semibold text-center">
                   {region.name}
                 </h3>
+                <p className="text-sm text-gray-200 mt-1">
+                  {region.type === 'kota' ? 'Kota' : 'Kabupaten'}
+                </p>
               </div>
             </button>
           ))}
@@ -179,7 +175,7 @@ const RegionList = () => {
                 <div className="absolute top-6 left-6 right-6 flex justify-between items-start z-10">
                   <span className="px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white text-xs font-bold flex items-center gap-1.5">
                     <MapPin className="w-3.5 h-3.5 text-blue-400" />
-                    {destination.region?.name}
+                    {destination.region?.name || 'Sumatera Barat'}
                   </span>
                   <div className="flex items-center gap-1 bg-white/90 backdrop-blur px-3 py-1.5 rounded-full shadow-lg">
                     <Star className="w-3.5 h-3.5 text-orange-500 fill-orange-500" />
@@ -252,7 +248,7 @@ const RegionList = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {events.map((event, index) => {
+            {events.map((event) => {
               const eventDate = new Date(event.event_date);
               return (
                 <div 
@@ -266,21 +262,21 @@ const RegionList = () => {
                         <span className="block text-xl font-bold">{eventDate.getDate()}</span>
                         <span className="block text-xs font-medium uppercase tracking-wider">{eventDate.toLocaleString('id-ID', { month: 'short' })}</span>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border ${event.status === 'open' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
-                        {event.status === 'open' ? 'Open Slot' : 'Full Booked'}
+                      <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                        Available
                       </span>
                     </div>
                     <h3 className="text-xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors line-clamp-2">
-                      {event.title}
+                      {event.name}
                     </h3>
-                    <div className="flex flex-col gap-2 text-slate-400 text-sm">
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-slate-500" />
-                        {event.event_time} WIB
-                      </div>
+                    <div className="flex flex-wrap gap-3 text-slate-400 text-sm mt-3">
                       <div className="flex items-center gap-2">
                         <MapPin className="w-4 h-4 text-slate-500" />
-                        <span className="truncate">{event.meeting_point}</span>
+                        <span className="truncate">{event.location}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Users className="w-4 h-4 text-slate-500" />
+                        <span>{event.max_participants || 0} Pax</span>
                       </div>
                     </div>
                   </div>
