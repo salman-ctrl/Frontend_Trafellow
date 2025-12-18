@@ -6,7 +6,10 @@ import Navbar from "@/components/layout/Nav";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import api from "@/lib/api";
 import { getImageUrl } from "@/lib/utils";
-import { Users, UserPlus, UserCheck, UserX, Search, Bell } from "lucide-react";
+import { 
+  Users, UserPlus, UserCheck, UserX, Search, Bell, 
+  MessageCircle, MapPin, Trash2, Shield, Sparkles 
+} from "lucide-react";
 import toast from "react-hot-toast";
 
 function FriendsContent() {
@@ -28,15 +31,12 @@ function FriendsContent() {
 
       if (activeTab === 'friends') {
         const { data } = await api.get('/friendships/friends');
-        console.log('Friends Response:', data); // Debug
         setFriends(data.data || []);
       } else if (activeTab === 'requests') {
         const { data } = await api.get('/friendships/pending');
-        console.log('Pending Requests Response:', data); // Debug
         setPendingRequests(data.data || []);
       } else if (activeTab === 'find') {
         const { data } = await api.get('/users');
-        console.log('All Users Response:', data); // Debug
         setAllUsers(data.data || []);
       }
     } catch (error) {
@@ -60,7 +60,6 @@ function FriendsContent() {
 
   const handleAcceptRequest = async (friendshipId) => {
     try {
-      // PERBAIKAN: Gunakan friendship_id sesuai dengan route backend
       await api.put(`/friendships/${friendshipId}/respond`, { status: 'accepted' });
       toast.success('Permintaan pertemanan diterima');
       fetchData();
@@ -72,7 +71,6 @@ function FriendsContent() {
 
   const handleRejectRequest = async (friendshipId) => {
     try {
-      // PERBAIKAN: Gunakan friendship_id sesuai dengan route backend
       await api.put(`/friendships/${friendshipId}/respond`, { status: 'rejected' });
       toast.success('Permintaan pertemanan ditolak');
       fetchData();
@@ -103,115 +101,136 @@ function FriendsContent() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div className="min-h-screen bg-slate-50">
       <Navbar />
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">Teman</h1>
-          <p className="text-gray-600">Kelola pertemanan dan temukan teman baru</p>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-3xl mx-auto text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Komunitas Traveler</h1>
+          <p className="text-lg text-gray-600">
+            Terhubung dengan sesama petualang, bagikan pengalaman, dan rencanakan perjalanan bersama.
+          </p>
         </div>
 
-        {/* Tabs */}
-        <div className="bg-white rounded-2xl shadow-lg p-2 mb-8 flex space-x-2">
-          <button
-            onClick={() => setActiveTab('friends')}
-            className={`flex-1 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center space-x-2 ${
-              activeTab === 'friends'
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
-          >
-            <Users className="w-5 h-5" />
-            <span>Teman ({friends.length})</span>
-          </button>
-          
-          <button
-            onClick={() => setActiveTab('requests')}
-            className={`flex-1 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center space-x-2 relative ${
-              activeTab === 'requests'
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
-          >
-            <Bell className="w-5 h-5" />
-            <span>Permintaan ({pendingRequests.length})</span>
-            {pendingRequests.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center">
-                {pendingRequests.length}
+        <div className="flex justify-center mb-10">
+          <div className="bg-white p-1.5 rounded-2xl shadow-sm border border-gray-200 inline-flex">
+            <button
+              onClick={() => setActiveTab('friends')}
+              className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center gap-2 ${
+                activeTab === 'friends'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+              }`}
+            >
+              <Users className="w-5 h-5" />
+              <span>Teman Saya</span>
+              <span className={`ml-2 text-xs py-0.5 px-2 rounded-full ${activeTab === 'friends' ? 'bg-white/20' : 'bg-gray-100'}`}>
+                {friends.length}
               </span>
-            )}
-          </button>
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('requests')}
+              className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center gap-2 ${
+                activeTab === 'requests'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+              }`}
+            >
+              <div className="relative">
+                <Bell className="w-5 h-5" />
+                {pendingRequests.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                )}
+              </div>
+              <span>Permintaan</span>
+              {pendingRequests.length > 0 && (
+                <span className={`ml-2 text-xs py-0.5 px-2 rounded-full ${activeTab === 'requests' ? 'bg-white/20' : 'bg-red-100 text-red-600'}`}>
+                  {pendingRequests.length}
+                </span>
+              )}
+            </button>
 
-          <button
-            onClick={() => setActiveTab('find')}
-            className={`flex-1 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center justify-center space-x-2 ${
-              activeTab === 'find'
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
-          >
-            <UserPlus className="w-5 h-5" />
-            <span>Cari Teman</span>
-          </button>
+            <button
+              onClick={() => setActiveTab('find')}
+              className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center gap-2 ${
+                activeTab === 'find'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+              }`}
+            >
+              <UserPlus className="w-5 h-5" />
+              <span>Cari Teman</span>
+            </button>
+          </div>
         </div>
 
-        {/* Content */}
-        <div className="bg-white rounded-2xl shadow-lg p-8">
-          {/* Friends List */}
+        <div className="min-h-[400px]">
           {activeTab === 'friends' && (
-            <div>
+            <div className="animate-fade-in-up">
               {loading ? (
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="bg-gray-200 rounded-xl h-20 animate-pulse"></div>
+                    <div key={i} className="bg-white rounded-2xl h-64 border border-gray-100 shadow-sm animate-pulse"></div>
                   ))}
                 </div>
               ) : friends.length === 0 ? (
-                <div className="text-center py-12">
-                  <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 text-lg">Belum ada teman</p>
+                <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-gray-300">
+                  <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-6">
+                    <Users className="w-10 h-10 text-blue-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900">Belum Ada Teman</h3>
+                  <p className="text-gray-500 mt-2 mb-6">Mulai tambahkan teman untuk berbagi cerita perjalanan.</p>
                   <button
                     onClick={() => setActiveTab('find')}
-                    className="mt-4 text-blue-600 hover:text-blue-700 font-semibold"
+                    className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-600/20"
                   >
-                    Cari Teman Sekarang
+                    Cari Teman Baru
                   </button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {friends.map((friend) => (
                     <div
                       key={friend.user_id}
-                      className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                      className="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-blue-100 hover:shadow-xl transition-all duration-300"
                     >
-                      <img
-                        src={getImageUrl(friend.profile_picture)}
-                        alt={friend.name}
-                        className="w-16 h-16 rounded-full object-cover border-2 border-blue-600"
-                      />
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-800 text-lg">{friend.name}</h3>
-                        <p className="text-sm text-gray-500">@{friend.username}</p>
+                      <div className="flex items-start justify-between mb-6">
+                        <div className="relative">
+                          <img
+                            src={getImageUrl(friend.profile_picture)}
+                            alt={friend.name}
+                            className="w-20 h-20 rounded-2xl object-cover shadow-md group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <div className="absolute -bottom-2 -right-2 bg-green-500 p-1 rounded-full border-4 border-white">
+                            <Shield className="w-3 h-3 text-white fill-white" />
+                          </div>
+                        </div>
+                        <div className="relative">
+                          <button className="text-gray-400 hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-xl" onClick={() => handleDeleteFriend(friend.friendship_id)}>
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="mb-6">
+                        <h3 className="text-xl font-bold text-gray-900 mb-1">{friend.name}</h3>
+                        <p className="text-sm text-gray-500 font-medium mb-3">@{friend.username}</p>
                         {friend.location && (
-                          <p className="text-sm text-gray-600 mt-1">📍 {friend.location}</p>
+                          <div className="flex items-center text-sm text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg w-fit">
+                            <MapPin className="w-3.5 h-3.5 mr-1.5 text-blue-500" />
+                            {friend.location}
+                          </div>
                         )}
                       </div>
-                      <div className="flex flex-col space-y-2">
-                        <button
-                          onClick={() => router.push(`/messages/${friend.user_id}`)}
-                          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
-                        >
-                          Pesan
-                        </button>
-                        <button
-                          onClick={() => handleDeleteFriend(friend.friendship_id)}
-                          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
-                        >
-                          Hapus
-                        </button>
-                      </div>
+
+                      <button
+                        onClick={() => router.push(`/messages/${friend.user_id}`)}
+                        className="w-full py-3 bg-blue-50 text-blue-600 font-semibold rounded-xl hover:bg-blue-600 hover:text-white transition-all duration-300 flex items-center justify-center gap-2 group-hover:shadow-lg group-hover:shadow-blue-600/20"
+                      >
+                        <MessageCircle className="w-5 h-5" />
+                        Kirim Pesan
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -219,57 +238,57 @@ function FriendsContent() {
             </div>
           )}
 
-          {/* Pending Requests */}
           {activeTab === 'requests' && (
-            <div>
+            <div className="animate-fade-in-up">
               {loading ? (
                 <div className="space-y-4">
                   {[1, 2].map((i) => (
-                    <div key={i} className="bg-gray-200 rounded-xl h-20 animate-pulse"></div>
+                    <div key={i} className="bg-white rounded-2xl h-24 animate-pulse"></div>
                   ))}
                 </div>
               ) : pendingRequests.length === 0 ? (
-                <div className="text-center py-12">
-                  <Bell className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 text-lg">Tidak ada permintaan pertemanan</p>
+                <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-gray-300">
+                  <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+                    <Sparkles className="w-10 h-10 text-gray-400" />
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900">Semua Bersih</h3>
+                  <p className="text-gray-500 mt-2">Tidak ada permintaan pertemanan tertunda saat ini.</p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="max-w-2xl mx-auto space-y-4">
                   {pendingRequests.map((request) => (
                     <div
                       key={request.friendship_id}
-                      className="flex items-center space-x-4 p-4 bg-blue-50 border-2 border-blue-200 rounded-xl"
+                      className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row items-center gap-6"
                     >
                       <img
                         src={getImageUrl(request.profile_picture)}
                         alt={request.name}
-                        className="w-16 h-16 rounded-full object-cover border-2 border-blue-600"
+                        className="w-16 h-16 rounded-2xl object-cover shadow-sm"
                       />
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-800 text-lg">{request.name}</h3>
-                        <p className="text-sm text-gray-500">@{request.username}</p>
-                        <p className="text-xs text-gray-400 mt-1">
-                          {new Date(request.created_at).toLocaleDateString('id-ID', {
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric'
-                          })}
+                      
+                      <div className="flex-1 text-center sm:text-left">
+                        <h3 className="text-lg font-bold text-gray-900">{request.name}</h3>
+                        <p className="text-sm text-gray-500 mb-1">@{request.username}</p>
+                        <p className="text-xs text-gray-400">
+                          Dikirim {new Date(request.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long' })}
                         </p>
                       </div>
-                      <div className="flex space-x-2">
+
+                      <div className="flex items-center gap-3 w-full sm:w-auto">
                         <button
                           onClick={() => handleAcceptRequest(request.friendship_id)}
-                          className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors flex items-center space-x-2"
+                          className="flex-1 sm:flex-none px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-blue-600/20 hover:shadow-blue-600/30 flex items-center justify-center gap-2"
                         >
                           <UserCheck className="w-4 h-4" />
-                          <span>Terima</span>
+                          Terima
                         </button>
                         <button
                           onClick={() => handleRejectRequest(request.friendship_id)}
-                          className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg font-semibold transition-colors flex items-center space-x-2"
+                          className="flex-1 sm:flex-none px-4 py-2.5 bg-white border border-gray-200 hover:bg-red-50 hover:border-red-100 hover:text-red-600 text-gray-600 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
                         >
                           <UserX className="w-4 h-4" />
-                          <span>Tolak</span>
+                          Tolak
                         </button>
                       </div>
                     </div>
@@ -279,60 +298,66 @@ function FriendsContent() {
             </div>
           )}
 
-          {/* Find Friends */}
           {activeTab === 'find' && (
-            <div>
-              {/* Search Bar */}
-              <div className="mb-6">
-                <div className="relative">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <div className="animate-fade-in-up">
+              <div className="max-w-2xl mx-auto mb-10">
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                    <Search className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                  </div>
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Cari nama atau username..."
-                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                    placeholder="Cari traveler berdasarkan nama atau username..."
+                    className="block w-full pl-12 pr-4 py-4 bg-white border border-gray-200 rounded-2xl text-gray-900 placeholder-gray-400 focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all shadow-sm outline-none font-medium"
                   />
                 </div>
               </div>
 
               {loading ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="bg-gray-200 rounded-xl h-20 animate-pulse"></div>
+                    <div key={i} className="bg-white rounded-2xl h-24 animate-pulse"></div>
                   ))}
                 </div>
               ) : filteredUsers.length === 0 ? (
-                <div className="text-center py-12">
-                  <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 text-lg">Tidak ada user ditemukan</p>
+                <div className="flex flex-col items-center justify-center py-20">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                    <Search className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <p className="text-gray-500 font-medium">Tidak ada user ditemukan dengan kata kunci tersebut.</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                   {filteredUsers.map((user) => (
                     <div
                       key={user.user_id}
-                      className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                      className="group bg-white p-5 rounded-2xl border border-gray-100 hover:border-blue-100 hover:shadow-lg transition-all flex items-center gap-5"
                     >
                       <img
                         src={getImageUrl(user.profile_picture)}
                         alt={user.name}
-                        className="w-16 h-16 rounded-full object-cover border-2 border-gray-300"
+                        className="w-16 h-16 rounded-2xl object-cover shadow-sm"
                       />
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-800 text-lg">{user.name}</h3>
-                        <p className="text-sm text-gray-500">@{user.username}</p>
+                      
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-gray-900 truncate">{user.name}</h3>
+                        <p className="text-sm text-gray-500 mb-2 truncate">@{user.username}</p>
                         {user.location && (
-                          <p className="text-sm text-gray-600 mt-1">📍 {user.location}</p>
+                          <div className="flex items-center text-xs text-gray-400">
+                            <MapPin className="w-3 h-3 mr-1" />
+                            {user.location}
+                          </div>
                         )}
                       </div>
+
                       <button
                         onClick={() => handleSendRequest(user.user_id)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center space-x-2"
                         disabled={loading}
+                        className="p-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all"
                       >
-                        <UserPlus className="w-4 h-4" />
-                        <span>Tambah</span>
+                        <UserPlus className="w-5 h-5" />
                       </button>
                     </div>
                   ))}
