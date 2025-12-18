@@ -106,7 +106,7 @@ const RegionList = () => {
           <p className="text-gray-600">Jelajahi destinasi wisata di berbagai wilayah Sumatera Barat</p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
           {regions.map((region) => (
             <button
               key={region.region_id}
@@ -382,14 +382,6 @@ const RegionList = () => {
                   <span>Jl. Jend. Sudirman No. 123, Padang, Sumatera Barat</span>
                 </li>
               </ul>
-            </div>
-          </div>
-
-          <div className="pt-8 border-t border-slate-200 text-center md:text-left flex flex-col md:flex-row justify-between items-center text-slate-400 text-sm">
-            <p>&copy; 2024 SumbarTravel. All rights reserved.</p>
-            <div className="flex gap-6 mt-4 md:mt-0">
-              <a href="#" className="hover:text-blue-600">Privacy Policy</a>
-              <a href="#" className="hover:text-blue-600">Terms of Service</a>
             </div>
           </div>
         </div>
