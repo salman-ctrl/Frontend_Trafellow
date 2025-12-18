@@ -7,7 +7,10 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import api from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import toast from "react-hot-toast";
-import { Calendar, Clock, MapPin, Users, FileText, Image as ImageIcon, X } from "lucide-react";
+import { 
+  Calendar, Clock, MapPin, Users, FileText, Image as ImageIcon, 
+  X, ChevronRight, Info, CheckCircle 
+} from "lucide-react";
 
 function CreateEventContent() {
   const router = useRouter();
@@ -63,6 +66,12 @@ function CreateEventContent() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    
+    // Prevent typing if length exceeds limit (client-side UX)
+    if (name === 'title' && value.length > 100) return;
+    if (name === 'meeting_point' && value.length > 100) return;
+    if (name === 'max_participants' && value.length > 4) return;
+
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -101,7 +110,6 @@ function CreateEventContent() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validation
     if (!formData.title || !formData.description || !formData.event_date || 
         !formData.event_time || !formData.region_id || !formData.meeting_point || 
         !formData.max_participants) {
@@ -146,274 +154,306 @@ function CreateEventContent() {
     }
   };
 
-  // Get tomorrow's date as minimum
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const minDate = tomorrow.toISOString().split('T')[0];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div className="min-h-screen bg-slate-50">
       <Navbar />
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">Buat Event Baru</h1>
-            <p className="text-gray-600">Ajak teman-teman untuk berpetualang bersama</p>
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="mb-10 text-center max-w-2xl mx-auto">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 tracking-tight">
+            Buat Event Petualangan
+          </h1>
+          <p className="text-gray-500 text-lg">
+            Ajak teman-teman dan komunitas untuk menjelajahi keindahan Sumatera Barat bersama.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="p-8 border-b border-gray-100 bg-gray-50/50">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-md">STEP 1</span>
+                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Informasi Dasar</span>
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">Detail Event</h2>
+              </div>
+              
+              <div className="p-8 space-y-8">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Judul Event</label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    maxLength={100}
+                    placeholder="Contoh: Pendakian Gunung Marapi Bersama"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all font-medium"
+                    required
+                  />
+                  <p className="text-right text-xs text-gray-400 mt-1">{formData.title.length}/100</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Deskripsi Lengkap</label>
+                  <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    rows="6"
+                    maxLength={2000}
+                    placeholder="Ceritakan tentang rencana perjalanan, itinerary, dan hal menarik lainnya..."
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
+                    required
+                  />
+                  <p className="text-right text-xs text-gray-400 mt-1">{formData.description.length}/2000</p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Tanggal Pelaksanaan</label>
+                    <div className="relative">
+                      <input
+                        type="date"
+                        name="event_date"
+                        value={formData.event_date}
+                        onChange={handleChange}
+                        min={minDate}
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        required
+                      />
+                      <Calendar className="absolute right-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Waktu Kumpul</label>
+                    <div className="relative">
+                      <input
+                        type="time"
+                        name="event_time"
+                        value={formData.event_time}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                        required
+                      />
+                      <Clock className="absolute right-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-8 border-t border-gray-100 bg-gray-50/50">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-md">STEP 2</span>
+                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Lokasi & Peserta</span>
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">Tujuan & Kuota</h2>
+              </div>
+
+              <div className="p-8 space-y-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Wilayah</label>
+                    <div className="relative">
+                      <select
+                        name="region_id"
+                        value={formData.region_id}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all appearance-none cursor-pointer"
+                        required
+                      >
+                        <option value="">Pilih Wilayah</option>
+                        {regions.map((region) => (
+                          <option key={region.region_id} value={region.region_id}>
+                            {region.name}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronRight className="absolute right-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none rotate-90" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Destinasi (Opsional)</label>
+                    <div className="relative">
+                      <select
+                        name="destination_id"
+                        value={formData.destination_id}
+                        onChange={handleChange}
+                        disabled={!formData.region_id}
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all appearance-none cursor-pointer disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      >
+                        <option value="">Pilih Destinasi</option>
+                        {destinations.map((dest) => (
+                          <option key={dest.destination_id} value={dest.destination_id}>
+                            {dest.name}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronRight className="absolute right-4 top-3.5 w-5 h-5 text-gray-400 pointer-events-none rotate-90" />
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Titik Kumpul (Meeting Point)</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="meeting_point"
+                      value={formData.meeting_point}
+                      onChange={handleChange}
+                      maxLength={100}
+                      placeholder="Lokasi spesifik untuk berkumpul..."
+                      className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                      required
+                    />
+                    <MapPin className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Kuota Peserta</label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      name="max_participants"
+                      value={formData.max_participants}
+                      onChange={handleChange}
+                      min="1"
+                      max="9999"
+                      placeholder="Maksimal orang"
+                      className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                      required
+                    />
+                    <Users className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                    <Info className="w-3 h-3" /> Termasuk Anda sebagai host
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-8 border-t border-gray-100 bg-gray-50/50">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-md">STEP 3</span>
+                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Visual</span>
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">Upload Foto</h2>
+              </div>
+
+              <div className="p-8">
+                {imagePreview ? (
+                  <div className="relative rounded-2xl overflow-hidden group">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-full h-64 object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="bg-white/90 hover:bg-white text-red-600 px-4 py-2 rounded-xl font-semibold shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-all flex items-center gap-2"
+                      >
+                        <X className="w-4 h-4" /> Hapus Foto
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-2xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors group">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <div className="p-4 bg-white rounded-full shadow-sm mb-4 group-hover:scale-110 transition-transform">
+                        <ImageIcon className="w-8 h-8 text-blue-500" />
+                      </div>
+                      <p className="mb-2 text-sm text-gray-500 font-medium">Klik untuk upload foto banner</p>
+                      <p className="text-xs text-gray-400">SVG, PNG, JPG (MAX. 5MB)</p>
+                    </div>
+                    <input 
+                      type="file" 
+                      className="hidden" 
+                      accept="image/*"
+                      onChange={handleImageChange}
+                    />
+                  </label>
+                )}
+              </div>
+
+              <div className="p-8 border-t border-gray-100 bg-gray-50 flex flex-col sm:flex-row gap-4">
+                <button
+                  type="button"
+                  onClick={() => router.back()}
+                  className="w-full sm:w-auto px-6 py-3.5 rounded-xl border border-gray-200 text-gray-600 font-semibold hover:bg-white hover:text-gray-900 hover:border-gray-300 transition-all"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full sm:flex-1 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-lg shadow-blue-600/20 hover:shadow-blue-600/30 transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Memproses...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="w-5 h-5" />
+                      <span>Publikasikan Event</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Title */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                <FileText className="w-4 h-4 mr-2 text-blue-600" />
-                Judul Event *
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                placeholder="Contoh: Pendakian Gunung Marapi"
-                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                required
-              />
+          <div className="lg:col-span-1 space-y-6">
+            <div className="bg-blue-600 rounded-3xl p-6 text-white shadow-xl shadow-blue-600/20">
+              <h3 className="text-lg font-bold mb-4">Tips Event Menarik</h3>
+              <ul className="space-y-4 text-blue-50 text-sm">
+                <li className="flex gap-3">
+                  <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center shrink-0 text-xs font-bold">1</div>
+                  <p>Gunakan judul yang singkat namun deskriptif dan menarik perhatian.</p>
+                </li>
+                <li className="flex gap-3">
+                  <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center shrink-0 text-xs font-bold">2</div>
+                  <p>Jelaskan itinerary atau kegiatan secara rinci agar peserta paham.</p>
+                </li>
+                <li className="flex gap-3">
+                  <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center shrink-0 text-xs font-bold">3</div>
+                  <p>Upload foto lokasi atau ilustrasi kegiatan yang berkualitas tinggi.</p>
+                </li>
+              </ul>
             </div>
 
-            {/* Description */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Deskripsi *
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                rows="5"
-                placeholder="Jelaskan detail event, apa yang akan dilakukan, persiapan yang diperlukan, dll."
-                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none"
-                required
-              />
-            </div>
-
-            {/* Date & Time */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                  <Calendar className="w-4 h-4 mr-2 text-blue-600" />
-                  Tanggal *
-                </label>
-                <input
-                  type="date"
-                  name="event_date"
-                  value={formData.event_date}
-                  onChange={handleChange}
-                  min={minDate}
-                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                  <Clock className="w-4 h-4 mr-2 text-blue-600" />
-                  Waktu *
-                </label>
-                <input
-                  type="time"
-                  name="event_time"
-                  value={formData.event_time}
-                  onChange={handleChange}
-                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Region & Destination */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                  <MapPin className="w-4 h-4 mr-2 text-blue-600" />
-                  Wilayah *
-                </label>
-                <select
-                  name="region_id"
-                  value={formData.region_id}
-                  onChange={handleChange}
-                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                  required
-                >
-                  <option value="">Pilih Wilayah</option>
-                  {regions.map((region) => (
-                    <option key={region.region_id} value={region.region_id}>
-                      {region.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Destinasi (Opsional)
-                </label>
-                <select
-                  name="destination_id"
-                  value={formData.destination_id}
-                  onChange={handleChange}
-                  disabled={!formData.region_id}
-                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all disabled:bg-gray-100"
-                >
-                  <option value="">Pilih Destinasi</option>
-                  {destinations.map((dest) => (
-                    <option key={dest.destination_id} value={dest.destination_id}>
-                      {dest.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Meeting Point */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Meeting Point *
-              </label>
-              <input
-                type="text"
-                name="meeting_point"
-                value={formData.meeting_point}
-                onChange={handleChange}
-                placeholder="Contoh: Stasiun Padang, Parkiran Jam Gadang"
-                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                required
-              />
-            </div>
-
-            {/* Coordinates (Optional) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Latitude (Opsional)
-                </label>
-                <input
-                  type="number"
-                  name="latitude"
-                  value={formData.latitude}
-                  onChange={handleChange}
-                  step="any"
-                  placeholder="-0.9471"
-                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Longitude (Opsional)
-                </label>
-                <input
-                  type="number"
-                  name="longitude"
-                  value={formData.longitude}
-                  onChange={handleChange}
-                  step="any"
-                  placeholder="100.4172"
-                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                />
-              </div>
-            </div>
-
-            {/* Max Participants */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                <Users className="w-4 h-4 mr-2 text-blue-600" />
-                Jumlah Peserta Maksimal *
-              </label>
-              <input
-                type="number"
-                name="max_participants"
-                value={formData.max_participants}
-                onChange={handleChange}
-                min="1"
-                placeholder="Contoh: 20"
-                className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                required
-              />
-            </div>
-
-            {/* Event Image */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center">
-                <ImageIcon className="w-4 h-4 mr-2 text-blue-600" />
-                Gambar Event (Opsional)
-              </label>
-              
-              {imagePreview ? (
-                <div className="relative">
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="w-full h-64 object-cover rounded-xl"
-                  />
-                  <button
-                    type="button"
-                    onClick={removeImage}
-                    className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full transition-colors"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
+            <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Preview Ringkas</h3>
+              <div className="space-y-4">
+                <div className="aspect-[4/3] bg-gray-100 rounded-xl overflow-hidden">
+                  {imagePreview ? (
+                    <img src={imagePreview} className="w-full h-full object-cover" alt="Preview" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">No Image</div>
+                  )}
                 </div>
-              ) : (
-                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-500 transition-colors cursor-pointer">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                    id="event-image"
-                  />
-                  <label htmlFor="event-image" className="cursor-pointer">
-                    <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-gray-600">
-                      <span className="text-blue-600 font-semibold">Klik untuk upload</span>
-                      {' '}atau drag & drop
-                    </p>
-                    <p className="text-sm text-gray-500 mt-2">PNG, JPG, GIF up to 5MB</p>
-                  </label>
+                <div>
+                  <h4 className="font-bold text-gray-900 line-clamp-2">
+                    {formData.title || 'Judul Event Anda'}
+                  </h4>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {formData.event_date || 'Tanggal'} • {formData.max_participants || '0'} Peserta
+                  </p>
                 </div>
-              )}
+              </div>
             </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-4 pt-6">
-              <button
-                type="button"
-                onClick={() => router.back()}
-                className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-4 rounded-xl transition-colors duration-200"
-              >
-                Batal
-              </button>
-              
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-1"
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Membuat Event...
-                  </span>
-                ) : (
-                  'Buat Event'
-                )}
-              </button>
-            </div>
-          </form>
+          </div>
         </div>
       </main>
     </div>
