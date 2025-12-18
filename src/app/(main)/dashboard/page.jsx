@@ -224,7 +224,6 @@ const RegionList = () => {
                   onClick={() => handleEventClick(event.event_id)}
                   className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition-colors duration-300 whitespace-nowrap"
                 >
-                  Lihat Detail
                 </button>
               </div>
             </div>
