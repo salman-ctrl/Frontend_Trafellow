@@ -6,17 +6,21 @@ import { useAuth } from '@/context/AuthContext';
 
 export default function Home() {
   const router = useRouter();
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user } = useAuth();
 
   useEffect(() => {
     if (!loading) {
-      if (isAuthenticated) {
-        router.push('/dashboard');
+      if (isAuthenticated && user) {
+        if (user.role === 'admin') {
+            router.push('/admin');
+        } else {
+            router.push('/dashboard');
+        }
       } else {
         router.push('/login');
       }
     }
-  }, [isAuthenticated, loading, router]);
+  }, [isAuthenticated, loading, router, user]);
 
   return (
     <div className="relative min-h-screen flex items-center justify-center p-6 overflow-hidden">
@@ -73,7 +77,7 @@ export default function Home() {
                 </div>
 
                 <p className="text-gray-500 text-sm font-medium animate-pulse">
-                    Memuat Petualangan Anda...
+                    Memuat Halaman...
                 </p>
             </div>
         </div>
